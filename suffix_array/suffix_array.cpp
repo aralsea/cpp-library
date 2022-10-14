@@ -10,6 +10,11 @@ using vl = vector<ll>;
 using vs = vector<string>;
 #define rep(i, n) for (int i = 0; i < n; i++)
 #define all(v) (v).begin(), (v).end()
+
+/*verify は　https://onlinejudge.u-aizu.ac.jp/problems/ALDS1_14_D */
+
+// O(|S|)でSのSuffix Arrayを構築する
+// Sが英小文字のみからなることを想定している．そうでない場合はコンストラクタを適切に変更する
 class SuffixArray {
     vi sa_is(const vi &S, const int K) {
         //数字の種類数がkの数列Sのsuffix arrayをO(|S|)で計算する
@@ -32,13 +37,8 @@ class SuffixArray {
                 LMSs.push_back(i);
             }
         }
-        /*cout << "LMSs = ";
-        for (int x : LMSs) {
-            cout << x << " ";
-        }
-        cout << endl;*/
+
         // step 2. 1回目のinduced sort
-        // cout << "first induced sort" << endl;
         vi first_sa = induced_sort(S, LMSs, is_S, K);
 
         // step 3. LMSsを辞書順ソート
@@ -49,11 +49,6 @@ class SuffixArray {
                 ordered_LMSs[l++] = idx;
             }
         }
-        /*cout << "orderd_LMSs = ";
-        for (int x : ordered_LMSs) {
-            cout << x << " ";
-        }
-        cout << endl;*/
 
         // LMS substring に rank をつけていく
         // first_saのLMS以外の部分はもういらないので再利用
@@ -83,12 +78,8 @@ class SuffixArray {
 
         vi sorted_LMSs;  //正しくソートされたLMSの配列
         if (rank + 1 == LMSs.size()) {
+            // LMS substringが全て異なる場合，既に正しくソートされている
             sorted_LMSs = ordered_LMSs;
-            /*cout << "sorted_LMSs = ";
-            for (int x : sorted_LMSs) {
-                cout << x << " ";
-            }
-            cout << endl;*/
         } else {
             // LMS substringを1文字とみた配列を作成
             vi small_S(ordered_LMSs.size());
@@ -98,31 +89,19 @@ class SuffixArray {
                     small_S[l++] = first_sa[i];
                 }
             }
-            /*cout << "small_S = ";
-            for (int x : small_S) {
-                cout << x << " ";
-            }
-            cout << endl;*/
-            sorted_LMSs = sa_is(small_S, rank + 1);
-            /*cout << "sorted_LMSs = ";
-            for (int x : sorted_LMSs) {
-                cout << x << " ";
-            }
-            cout << endl;*/
+
+            sorted_LMSs = sa_is(small_S, rank + 1);  //正しくソートされる
+
+            // rankで置き換えられたLMSの配列を，元のindexに復元する
+            //このとき列の先頭には空文字列に対応するやつがいるので，それを除く
             for (int &x : sorted_LMSs) {
                 if (x == LMSs.size()) continue;
                 x = LMSs[x];
             }
             sorted_LMSs.erase(sorted_LMSs.begin());
-            /*cout << "sorted_LMSs, fixed = ";
-            for (int x : sorted_LMSs) {
-                cout << x << " ";
-            }
-            cout << endl;*/
         }
 
         // step 4. もう一度induced sortする
-        // cout << "second induced sort" << endl;
         return induced_sort(S, sorted_LMSs, is_S, K);
     };
 
@@ -155,39 +134,6 @@ class SuffixArray {
             int c = S[LMSs[i]];
             SA[chars[c + 1] - count[c]++] = LMSs[i];
         }
-        /*
-        // output
-        int cc = 0;
-        int res_L = 0;
-        for (int i = 0; i <= N; i++) {
-            cout << setw(2) << i << " ";
-            if (i == 0) {
-                cout << "$ S : ";
-            } else {
-                while (i > chars[cc + 1]) {
-                    cc++;
-                    res_L = count_L[cc];
-                }
-                cout << char(cc + 'a') << " ";
-                if (res_L > 0) {
-                    cout << "L : ";
-                    res_L--;
-                } else {
-                    cout << "S : ";
-                }
-            }
-
-            if (SA[i] == -1) {
-                cout << "--" << endl;
-            } else {
-                cout << setw(2) << SA[i] << " ";
-                for (int j = SA[i]; j < N; j++) {
-                    cout << char(S[j] + 'a');
-                }
-                cout << "$" << endl;
-            }
-        }
-        cout << endl;*/
 
         // step 2. SAを前から見ていって，L型のidxをSAの先頭から入れていく
         count.assign(K, 0);
@@ -201,39 +147,6 @@ class SuffixArray {
             SA[chars[c] + 1 + count[c]] = SA[i] - 1;
             count[c]++;
         }
-        /*
-        // output
-        cc = 0;
-        res_L = 0;
-        for (int i = 0; i <= N; i++) {
-            cout << setw(2) << i << " ";
-            if (i == 0) {
-                cout << "$ S : ";
-            } else {
-                while (i > chars[cc + 1]) {
-                    cc++;
-                    res_L = count_L[cc];
-                }
-                cout << char(cc + 'a') << " ";
-                if (res_L > 0) {
-                    cout << "L : ";
-                    res_L--;
-                } else {
-                    cout << "S : ";
-                }
-            }
-
-            if (SA[i] == -1) {
-                cout << "--" << endl;
-            } else {
-                cout << setw(2) << SA[i] << " ";
-                for (int j = SA[i]; j < N; j++) {
-                    cout << char(S[j] + 'a');
-                }
-                cout << "$" << endl;
-            }
-        }
-        cout << endl;*/
 
         // step 3. SAを後ろから見ていって，S型のidxを後ろから入れていく
         count.assign(K, 0);
@@ -246,39 +159,6 @@ class SuffixArray {
             int c = S[SA[i] - 1];
             SA[chars[c + 1] - count[c]++] = SA[i] - 1;
         }
-        /*
-        // output
-        cc = 0;
-        res_L = 0;
-        for (int i = 0; i <= N; i++) {
-            cout << setw(2) << i << " ";
-            if (i == 0) {
-                cout << "$ S : ";
-            } else {
-                while (i > chars[cc + 1]) {
-                    cc++;
-                    res_L = count_L[cc];
-                }
-                cout << char(cc + 'a') << " ";
-                if (res_L > 0) {
-                    cout << "L : ";
-                    res_L--;
-                } else {
-                    cout << "S : ";
-                }
-            }
-
-            if (SA[i] == -1) {
-                cout << "--" << endl;
-            } else {
-                cout << setw(2) << SA[i] << " ";
-                for (int j = SA[i]; j < N; j++) {
-                    cout << char(S[j] + 'a');
-                }
-                cout << "$" << endl;
-            }
-        }
-        cout << endl;*/
 
         return SA;
     }
@@ -296,128 +176,12 @@ class SuffixArray {
     }
 };
 
-class StupidSuffixArray {
-    vi stupid_sa(const string &S) {
-        vi sa(N + 1);
-        int N = S.size();
-        for (int i = 0; i <= N; i++) {
-            sa[i] = i;
-        }
-
-        sort(all(sa), [&](const int &l, const int &r) {
-            return S.substr(l) < S.substr(r);
-        });
-        return sa;
-    }
-
-   public:
-    string S;
-    int N;
-    vi sa;
-    StupidSuffixArray(string str) : S(str), N(str.size()) {
-        sa = stupid_sa(S);
-    }
-};
 int main() {
-    /*int M = 15;
-    vector<string> str;
-    str.push_back("");
-    for (int x = 1; x <= M; x++) {
-        cout << "length " << x << " strings..." << endl;
-        vector<string> new_str;
-        for (int y = 0; y < 10; y++) {
-            for (string t : str) {
-                string S = t + char('a' + y);
-                int N = S.size();
-
-                SuffixArray Z(S);
-                StupidSuffixArray W(S);
-                bool is_ok = true;
-                for (int i = 0; i <= N; i++) {
-                    if (Z.sa[i] != W.sa[i]) {
-                        is_ok = false;
-                        cout << "Failed for " << S << endl;
-                        break;
-                    }
-                }
-                if (is_ok) {
-                    // cout << "OK for " << S << endl;
-
-                } else {
-                    cout << "Suffix array" << endl;
-                    for (int i = 0; i <= N; i++) {
-                        cout << setw(2) << i << " ";
-                        cout << S.substr(Z.sa[i]) << "$ ";
-                        if (Z.sa[i] != W.sa[i]) {
-                            cout << "<-" << endl;
-                        } else {
-                            cout << endl;
-                        }
-                    }
-                    cout << endl;
-
-                    cout << "Stupid Suffix array" << endl;
-                    for (int i = 0; i <= N; i++) {
-                        cout << setw(2) << i << " ";
-                        cout << S.substr(W.sa[i]) << "$ ";
-                        if (Z.sa[i] != W.sa[i]) {
-                            cout << "<-" << endl;
-                        } else {
-                            cout << endl;
-                        }
-                    }
-                    return 0;
-                }
-                new_str.push_back(S);
-            }
-        }
-        str = new_str;
-    }*/
-    string S = "bababac";
+    string S;
+    cin >> S;
     int N = S.size();
-
     SuffixArray Z(S);
-    StupidSuffixArray W(S);
-    bool is_ok = true;
-    for (int i = 0; i <= N; i++) {
-        if (Z.sa[i] != W.sa[i]) {
-            is_ok = false;
-            cout << "Failed for " << S << endl;
-            break;
-        }
-    }
-    if (is_ok) {
-        cout << "OK for " << S << endl;
-    } else {
-        cout << "Suffix array" << endl;
-        for (int i = 0; i <= N; i++) {
-            cout << setw(2) << i << " ";
-            cout << S.substr(Z.sa[i]) << "$ ";
-            if (Z.sa[i] != W.sa[i]) {
-                cout << "<-" << endl;
-            } else {
-                cout << endl;
-            }
-        }
-        cout << endl;
-
-        cout << "Stupid Suffix array" << endl;
-        for (int i = 0; i <= N; i++) {
-            cout << setw(2) << i << " ";
-            cout << S.substr(W.sa[i]) << "$ ";
-            if (Z.sa[i] != W.sa[i]) {
-                cout << "<-" << endl;
-            } else {
-                cout << endl;
-            }
-        }
-    }
-    /*for (int i = 0; i <= N; i++) {
-        cout << i << " ";
-        cout << S.substr(Z.sa[i], S.size() - Z.sa[i]) << "$" << endl;
-    }*/
-
-    /*int Q;
+    int Q;
     cin >> Q;
     vi ans(Q);
     rep(q, Q) {
@@ -448,5 +212,5 @@ int main() {
 
     for (int a : ans) {
         cout << a << endl;
-    }*/
+    }
 }
