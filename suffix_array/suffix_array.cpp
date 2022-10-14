@@ -32,13 +32,13 @@ class SuffixArray {
                 LMSs.push_back(i);
             }
         }
-        cout << "LMSs = ";
+        /*cout << "LMSs = ";
         for (int x : LMSs) {
             cout << x << " ";
         }
-        cout << endl;
+        cout << endl;*/
         // step 2. 1回目のinduced sort
-        cout << "first induced sort" << endl;
+        // cout << "first induced sort" << endl;
         vi first_sa = induced_sort(S, LMSs, is_S, K);
 
         // step 3. LMSsを辞書順ソート
@@ -49,11 +49,11 @@ class SuffixArray {
                 ordered_LMSs[l++] = idx;
             }
         }
-        cout << "orderd_LMSs = ";
+        /*cout << "orderd_LMSs = ";
         for (int x : ordered_LMSs) {
             cout << x << " ";
         }
-        cout << endl;
+        cout << endl;*/
 
         // LMS substring に rank をつけていく
         // first_saのLMS以外の部分はもういらないので再利用
@@ -84,11 +84,11 @@ class SuffixArray {
         vi sorted_LMSs;  //正しくソートされたLMSの配列
         if (rank + 1 == LMSs.size()) {
             sorted_LMSs = ordered_LMSs;
-            cout << "sorted_LMSs = ";
+            /*cout << "sorted_LMSs = ";
             for (int x : sorted_LMSs) {
                 cout << x << " ";
             }
-            cout << endl;
+            cout << endl;*/
         } else {
             // LMS substringを1文字とみた配列を作成
             vi small_S(ordered_LMSs.size());
@@ -98,31 +98,31 @@ class SuffixArray {
                     small_S[l++] = first_sa[i];
                 }
             }
-            cout << "small_S = ";
+            /*cout << "small_S = ";
             for (int x : small_S) {
                 cout << x << " ";
             }
-            cout << endl;
+            cout << endl;*/
             sorted_LMSs = sa_is(small_S, rank + 1);
-            cout << "sorted_LMSs = ";
+            /*cout << "sorted_LMSs = ";
             for (int x : sorted_LMSs) {
                 cout << x << " ";
             }
-            cout << endl;
+            cout << endl;*/
             for (int &x : sorted_LMSs) {
                 if (x == LMSs.size()) continue;
                 x = LMSs[x];
             }
             sorted_LMSs.erase(sorted_LMSs.begin());
-            cout << "sorted_LMSs, fixed = ";
+            /*cout << "sorted_LMSs, fixed = ";
             for (int x : sorted_LMSs) {
                 cout << x << " ";
             }
-            cout << endl;
+            cout << endl;*/
         }
 
         // step 4. もう一度induced sortする
-        cout << "second induced sort" << endl;
+        // cout << "second induced sort" << endl;
         return induced_sort(S, sorted_LMSs, is_S, K);
     };
 
@@ -155,7 +155,7 @@ class SuffixArray {
             int c = S[LMSs[i]];
             SA[chars[c + 1] - count[c]++] = LMSs[i];
         }
-
+        /*
         // output
         int cc = 0;
         int res_L = 0;
@@ -187,7 +187,7 @@ class SuffixArray {
                 cout << "$" << endl;
             }
         }
-        cout << endl;
+        cout << endl;*/
 
         // step 2. SAを前から見ていって，L型のidxをSAの先頭から入れていく
         count.assign(K, 0);
@@ -201,7 +201,7 @@ class SuffixArray {
             SA[chars[c] + 1 + count[c]] = SA[i] - 1;
             count[c]++;
         }
-
+        /*
         // output
         cc = 0;
         res_L = 0;
@@ -233,7 +233,7 @@ class SuffixArray {
                 cout << "$" << endl;
             }
         }
-        cout << endl;
+        cout << endl;*/
 
         // step 3. SAを後ろから見ていって，S型のidxを後ろから入れていく
         count.assign(K, 0);
@@ -246,7 +246,7 @@ class SuffixArray {
             int c = S[SA[i] - 1];
             SA[chars[c + 1] - count[c]++] = SA[i] - 1;
         }
-
+        /*
         // output
         cc = 0;
         res_L = 0;
@@ -278,7 +278,7 @@ class SuffixArray {
                 cout << "$" << endl;
             }
         }
-        cout << endl;
+        cout << endl;*/
 
         return SA;
     }
