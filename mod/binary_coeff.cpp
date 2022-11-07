@@ -36,10 +36,18 @@ void COMinit(ll MAX, ll MOD) {
 }
 
 // 二項係数計算 nCkを与える
+// n = -mが負の数の場合には，負の二項係数を
+//  (-m)Ck = (-1)^k (m+k-1)Ck
+// により返す
 ll COM(ll MOD, ll n, ll k) {
-    if (n < k) return 0;
-    if (n < 0 || k < 0) return 0;
-    return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD;
+    if (0 <= n && n < k) return 0;
+    if (k < 0) return 0;
+    if (n >= 0) {
+        return fac[n] * (finv[k] * finv[n - k] % MOD) % MOD;
+    } else {
+        ll ret = COM(MOD, -n + k - 1, k);
+        return (k % 2) ? (MOD - ret) % MOD : ret;
+    }
 }
 
 ll modpow(ll MOD, ll b, ll p) {
